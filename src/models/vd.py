@@ -11,6 +11,7 @@ import torch.nn.functional as F
 from src.metrics import Statistic
 from torch_geometric.data import Batch
 from src.vocabulary import Vocabulary
+from src.models.surrogate.encoder import SurrogateEncoder
 
 
 class DeepWuKong(LightningModule):
@@ -31,7 +32,8 @@ class DeepWuKong(LightningModule):
 
     _encoders = {
         "gcn": GraphConvEncoder,
-        "ggnn": GatedGraphConvEncoder
+        "ggnn": GatedGraphConvEncoder,
+        "surrogate": SurrogateEncoder,
     }
 
     def __init__(self, config: DictConfig, vocab: Vocabulary, vocabulary_size: int,

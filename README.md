@@ -1,6 +1,28 @@
-# DeepWukong
+# deepwukong-docker
+
+Reproducing results of the following paper using docker:
 
 > (TOSEM'21) DeepWukong: Statically Detecting Software Vulnerabilities Using Deep Graph Neural Network
+
+## Adjustments
+
+This is an overview about the applied adjustments:
+
+- needed to update the following dependencies (to work with my cuda version):
+  -  torch from `1.9.0` to `1.13.0`
+  -  torch-scatter from `2.0.7` to `2.1.0`
+  -  torch-sparse from `0.6.10` to `0.6.16`
+-  added: write test results to JSON file
+-  disabled: cudnn support (didn't work on my hardware)
+
+
+## Reproduction (docker) Setup and Usage
+
+```shell
+docker build . -t dwk
+docker run --rm --gpus '"device=0,3"' -v $(realpath data):/root/dwk/data -v $(realpath dwk_data):/root/dwk/dwk_data dwk ./scripts/reproduce_all.sh  # change device IDs as needed
+
+```
 
 ## Setup
 
