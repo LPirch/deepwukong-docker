@@ -27,5 +27,5 @@ COPY . ${BASE_DIR}
 WORKDIR ${BASE_DIR}
 
 RUN ./scripts/env_cuda.sh
-RUN cd src/joern && ./build.sh
+RUN ./scripts/setup_joern.sh
 RUN ./scripts/download.sh
