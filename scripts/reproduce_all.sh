@@ -2,6 +2,9 @@
 
 BASE_DIR=$(realpath $(dirname $(dirname $0)))
 
-${BASE_DIR}/scripts/eval_pretrained.sh
-${BASE_DIR}/scripts/repro_preprocessed.sh
-${BASE_DIR}/scripts/repro_raw.sh
+# evaluate models on preprocessed data
+${BASE_DIR}/scripts/eval_preprocessed.sh
+
+# re-extract data using joern
+# TODO
+${BASE_DIR}/scripts/eval_raw.sh || echo "skipping raw evaluation (not implemented yet)"
