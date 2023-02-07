@@ -3,15 +3,22 @@
 BASE_DIR=$(realpath $(dirname $(dirname $0)))
 
 # check for dependencies
-for cmd in 7z wget realpath; do
+for cmd in 7z wget realpath git; do
     if ! command -v $cmd &> /dev/null; then
         echo "ERROR: missing $cmd command"
         exit 1
     fi
 done
 
+JOERN_URL="https://github.com/ives-nx/dwk_preprocess.git"
 DATA_URL="https://bupteducn-my.sharepoint.com/:u:/g/personal/jackiecheng_bupt_edu_cn/EalnVAYC8zZDgwhPmGJ034cBYNZ8zB7-mNSNm-a7oYXkcw\?download\=1"
 MODEL_URL="https://bupteducn-my.sharepoint.com/:u:/g/personal/jackiecheng_bupt_edu_cn/EesTvivx1UlEo9THYRSCYkMBMsZqKXgNVYx9wTToYnDwxg\?download\=1"
+
+# clone deprecated version of joern
+tmp_dir=".dwk-preprocess"
+git clone $JOERN_URL ${tmp_dir}
+mv ${tmp_dir}/joern_slicer/joern ./
+rm -rf ${tmp_dir}
 
 wget -O ${BASE_DIR}/data/data.7z ${DATA_URL}
 mkdir -p ${BASE_DIR}/models
