@@ -10,7 +10,7 @@ RUN mkdir -p /usr/share/man/man1 \
  && apt-get install -y --no-install-recommends openjdk-8-jdk wget gradle \
     build-essential libgraphviz-dev tar zlib1g-dev libffi-dev libreadline-gplv2-dev \
     libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev \
-    p7zip-full wget
+    p7zip-full wget git
 RUN wget https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tar.xz \
  && tar -xf Python-3.8.2.tar.xz \
  && cd Python-3.8.2 \
