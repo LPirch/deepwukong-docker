@@ -20,35 +20,55 @@ This is an overview about the applied adjustments:
 
 ```shell
 docker build . -t dwk
-docker run --rm --gpus '"device=0,3"' -v $(realpath data):/root/dwk/data -v $(realpath dwk_data):/root/dwk/dwk_data dwk ./scripts/reproduce_all.sh  # change device IDs as needed
+# change device IDs as needed
+docker run --rm --gpus '"device=0,3"' -v $(realpath data):/root/dwk/data -v $(realpath dwk_data):/root/dwk/dwk_data dwk ./scripts/reproduce_all.sh
 
 ```
 
+## Included Experiments
+
+- `scripts/eval_preprocessed.sh`
+  - preprocessed data + pretrained model
+  - preprocessed data + re-trained model
+  - preprocessed data + surrogate GCN architecture
+  - preprocessed data + surrogate simple MLP
+- `scripts/eval_raw.sh` (TODO)
+  - same as above but after re-processing the SARD dataset
+
 ## Setup
 
-- Environment
+- Environment (CPU)
 
     ```shell
-    bash env.sh
+    bash scripts/env_cpu.sh
     ```
 
-- Preprocessed Data
+- Environment (cuda 11.7)
 
-    Download from [data](https://bupteducn-my.sharepoint.com/:u:/g/personal/jackiecheng_bupt_edu_cn/EalnVAYC8zZDgwhPmGJ034cBYNZ8zB7-mNSNm-a7oYXkcw?e=eRUc50), and unzip the data under `<project root>/data` folder.
+    ```shell
+    bash scripts/env_cuda.sh
+    ```
+
+- Preprocessed Data, Pretrained Model
+
+    ```shell
+    bash scripts/download.sh
+    ```
+
+- setup of deprecated joern version used by the authors
+
+    ```shell
+    bash scripts/joern_setup.sh
+    ```
 
 ---
 
-## One-Step Evaluation
+## Evaluation
 
-- From Pretrained model
-  
-  - Download from [pretrained model](https://bupteducn-my.sharepoint.com/:u:/g/personal/jackiecheng_bupt_edu_cn/EesTvivx1UlEo9THYRSCYkMBMsZqKXgNVYx9wTToYnDwxg?e=Z4nz23).
-  - `PYTHONPATH="." python src/evaluate.py <path to the pretrained model>`
-
-- Training and Testing
+- Evaluating on preprocessed data
 
   ```shell
-  bash run.sh
+  bash ./eval_preprocessed.sh
   ```
 
 ---
