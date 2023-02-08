@@ -7,8 +7,6 @@ log_offline: false
 joern_path: "joern/joern-parse"
 split_token: false
 
-# results
-result_folder: "results"
 
 # data keys
 data_folder: "data"
@@ -16,6 +14,9 @@ save_every_epoch: 1
 val_every_epoch: 1
 log_every_epoch: 10
 progress_bar_refresh_rate: 1
+
+# results
+result_folder: "${data_folder}/results"
 
 dataset:
   name: CWE119
