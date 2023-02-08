@@ -20,9 +20,9 @@ This is an overview about the applied adjustments:
 
 ```shell
 docker build . -t dwk
-# change device IDs as needed
-docker run --rm --gpus '"device=0,3"' -v $(realpath data):/root/dwk/data dwk ./scripts/reproduce_all.sh
 
+# change device IDs as needed
+docker run --gpus '"device=0,3"' -v $(realpath data):/root/dwk/data dwk ./scripts/reproduce_all.sh
 ```
 
 ## Included Experiments
@@ -35,7 +35,7 @@ docker run --rm --gpus '"device=0,3"' -v $(realpath data):/root/dwk/data dwk ./s
 - `scripts/eval_raw.sh` (TODO)
   - same as above but after re-processing the SARD dataset
 
-## Setup
+## Internal Setup
 
 - Environment (CPU)
 
