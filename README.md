@@ -1,32 +1,74 @@
-# DeepWukong
+# deepwukong-docker
+
+Reproducing results of the following paper using docker:
 
 > (TOSEM'21) DeepWukong: Statically Detecting Software Vulnerabilities Using Deep Graph Neural Network
 
-## Setup
+## Adjustments
 
-- Environment
+This is an overview about the applied adjustments:
+
+- needed to update the following dependencies (to work with my cuda version):
+  -  torch from `1.9.0` to `1.13.0`
+  -  torch-scatter from `2.0.7` to `2.1.0`
+  -  torch-sparse from `0.6.10` to `0.6.16`
+-  added: write test results to JSON file
+-  disabled: cudnn support (didn't work on my hardware)
+
+
+## Reproduction (docker) Setup and Usage
+
+```shell
+docker build . -t dwk
+
+# change device IDs as needed
+docker run --gpus '"device=0,3"' -v $(realpath data):/root/dwk/data dwk ./scripts/reproduce_all.sh
+```
+
+## Included Experiments
+
+- `scripts/eval_preprocessed.sh`
+  - preprocessed data + pretrained model
+  - preprocessed data + re-trained model
+  - preprocessed data + surrogate GCN architecture
+  - preprocessed data + surrogate simple MLP
+- `scripts/eval_raw.sh` (TODO)
+  - same as above but after re-processing the SARD dataset
+
+## Internal Setup
+
+- Environment (CPU)
 
     ```shell
-    bash env.sh
+    bash scripts/env_cpu.sh
     ```
 
-- Preprocessed Data
+- Environment (cuda 11.7)
 
-    Download from [data](https://bupteducn-my.sharepoint.com/:u:/g/personal/jackiecheng_bupt_edu_cn/EalnVAYC8zZDgwhPmGJ034cBYNZ8zB7-mNSNm-a7oYXkcw?e=eRUc50), and unzip the data under `<project root>/data` folder.
+    ```shell
+    bash scripts/env_cuda.sh
+    ```
+
+- Preprocessed Data, Pretrained Model
+
+    ```shell
+    bash scripts/download.sh
+    ```
+
+- setup of deprecated joern version used by the authors
+
+    ```shell
+    bash scripts/joern_setup.sh
+    ```
 
 ---
 
-## One-Step Evaluation
+## Evaluation
 
-- From Pretrained model
-  
-  - Download from [pretrained model](https://bupteducn-my.sharepoint.com/:u:/g/personal/jackiecheng_bupt_edu_cn/EesTvivx1UlEo9THYRSCYkMBMsZqKXgNVYx9wTToYnDwxg?e=Z4nz23).
-  - `PYTHONPATH="." python src/evaluate.py <path to the pretrained model>`
-
-- Training and Testing
+- Evaluating on preprocessed data
 
   ```shell
-  bash run.sh
+  bash ./eval_preprocessed.sh
   ```
 
 ---

@@ -1,3 +1,5 @@
+import os
+import json
 from os.path import basename, join
 
 import torch
@@ -6,6 +8,9 @@ from omegaconf import DictConfig
 from pytorch_lightning import LightningModule, LightningDataModule, Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping, LearningRateMonitor
 from pytorch_lightning.loggers import TensorBoardLogger
+
+# FIXME: cudnn not working
+torch.backends.cudnn.enabled = False
 
 
 def train(model: LightningModule, data_module: LightningDataModule,
@@ -54,4 +59,12 @@ def train(model: LightningModule, data_module: LightningDataModule,
     )
 
     trainer.fit(model=model, datamodule=data_module)
-    trainer.test(model=model)
+    test_results = trainer.test(model=model)[0]
+    save_results(config, test_results)
+
+
+def save_results(config, results):
+    os.makedirs(config.result_folder, exist_ok=True)
+    outfile = join(config.result_foldeer, f"{config.name}.json")
+    with open(outfile, 'w') as f:
+        json.dump(results, f)
