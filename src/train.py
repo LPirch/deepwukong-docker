@@ -65,6 +65,6 @@ def train(model: LightningModule, data_module: LightningDataModule,
 
 def save_results(config, results):
     os.makedirs(config.result_folder, exist_ok=True)
-    outfile = join(config.result_foldeer, f"{config.name}.json")
+    outfile = join(config.result_folder, f"{config.name}.json")
     with open(outfile, 'w') as f:
         json.dump(results, f)
