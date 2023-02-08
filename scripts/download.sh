@@ -14,15 +14,15 @@ DATA_URL=https://bupteducn-my.sharepoint.com/:u:/g/personal/jackiecheng_bupt_edu
 MODEL_URL=https://bupteducn-my.sharepoint.com/:u:/g/personal/jackiecheng_bupt_edu_cn/EesTvivx1UlEo9THYRSCYkMBMsZqKXgNVYx9wTToYnDwxg\?download\=1
 
 mkdir -p ${BASE_DIR}/data
-wget -O ${BASE_DIR}/data/data.7z ${DATA_URL}
 mkdir -p ${BASE_DIR}/models
+
+wget -O ${BASE_DIR}/data.7z ${DATA_URL}
 wget -O ${BASE_DIR}/models/dwk_pretrained.pt ${MODEL_URL}
+
 
 # extract data
 pushd ${BASE_DIR}/data
-7z x data.7z && rm data.7z
+7z x ../data.7z
 popd
 
-# copy data to allow parallel reproduction 
-# from preprocessed and self-processed data/models
-cp -r ${BASE_DIR}/data ${BASE_DIR}/dwk_data
+rm ${BASE_DIR}/data.7z

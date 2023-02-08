@@ -21,7 +21,7 @@ This is an overview about the applied adjustments:
 ```shell
 docker build . -t dwk
 # change device IDs as needed
-docker run --rm --gpus '"device=0,3"' -v $(realpath data):/root/dwk/data -v $(realpath dwk_data):/root/dwk/dwk_data dwk ./scripts/reproduce_all.sh
+docker run --rm --gpus '"device=0,3"' -v $(realpath data):/root/dwk/data dwk ./scripts/reproduce_all.sh
 
 ```
 
