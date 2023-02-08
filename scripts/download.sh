@@ -25,4 +25,4 @@ popd
 
 # copy data to allow parallel reproduction 
 # from preprocessed and self-processed data/models
-cp -r ${BASE_DIR}/data {BASE_DIR}/dwk_data
+cp -r ${BASE_DIR}/data ${BASE_DIR}/dwk_data
