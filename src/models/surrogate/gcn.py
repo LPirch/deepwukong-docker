@@ -9,33 +9,35 @@ train = False
 def softmin(b): return -0.5*torch.log(1.0+torch.exp(-2*b))
 
 class Block(torch.nn.Module):
-    def __init__(self, s, k, device='cpu'):
+    def __init__(self, s, k):
         super().__init__()
-        self.device = device
         self.W = []
         self.B = []
         for a,b in zip(s[:-1],s[1:]):
             self.W += [
                 torch.nn.Parameter(torch.FloatTensor([
                     numpy.random.normal(0,a**-.5,[a,b]) for _ in range(k)
-                ], device=self.device))
+                ]))
             ]
             self.B += [
                 torch.nn.Parameter(torch.FloatTensor([
                     numpy.random.normal(0,1,[b]) for _ in range(k)
-                ], device=self.device))
+                ]))
             ]
-        self.W = torch.nn.ModuleList(self.W)
-        self.B = torch.nn.ModuleList(self.B)
+        self.W = torch.nn.ParameterList(self.W)
+        self.B = torch.nn.ParameterList(self.B)
 
-    def forward(self,Hin,A,mask=1):
+    def forward(self,Hin,A,mask=None):
 
         n = Hin.shape[0]
+        device = Hin.device
+        if mask is None:
+            mask = torch.ones((1,), device=device)
 
         # FIXME: doesn't work for len(self.W) == 1
-        for Wo,Bo,Ao in zip(self.W,self.B,[A*mask]+[torch.eye(n, device=self.device).reshape(1,n,n)]*(len(self.W)-1)):
+        for Wo,Bo,Ao in zip(self.W,self.B,[A*mask]+[torch.eye(n, device=device).reshape(1,n,n)]*(len(self.W)-1)):
 
-            Hout = 0
+            Hout = torch.zeros((1,), device=device)
             for ao,wo,bo in zip(Ao,Wo,Bo):
                 bo = softmin(bo)
                 Hout = Hout + ao.permute(1,0).matmul(Hin).matmul(wo) + bo
@@ -49,9 +51,10 @@ class Block(torch.nn.Module):
 
     def lrpforward(self,Hin,A,gamma):
         n = Hin.shape[0]
+        device = Hin.device
         for Wo,Bo,Ao in zip(self.W,self.B,[A]+[torch.eye(n).reshape(1,n,n)]*(len(self.W)-1)):
-            Hout = torch.zeros((1,), device=self.device)
-            Pout = torch.FloatTensor(1e-6, device=self.device)
+            Hout = torch.zeros((1,), device=device)
+            Pout = torch.FloatTensor(1e-6, device=device)
             for ao,wo,bo in zip(Ao,Wo,Bo):
                 bo = softmin(bo)
                 Hout = Hout + ao.permute(1,0).matmul(Hin).matmul(wo) + bo
@@ -73,12 +76,12 @@ class Block(torch.nn.Module):
 
 class GNN(torch.nn.Module):
 
-    def __init__(self,*sizes,mode='std', device='cpu'):
+    def __init__(self,*sizes,mode='std'):
         super().__init__()
         if mode == 'std': k=1
         if mode == 'cheb': k=3
 
-        self.blocks = torch.nn.ModuleList([Block([s, s, s],k, device=device) for s in sizes])
+        self.blocks = torch.nn.ModuleList([Block([s, s, s],k) for s in sizes])
         self.mode = mode
 
     def __call__(self, x, edge_index, masks=None):
@@ -98,7 +101,7 @@ class GNN(torch.nn.Module):
             return A/1**.5
 
         if self.mode == 'cheb':
-            L0 = torch.eye(len(A))
+            L0 = torch.eye(len(A), device=A.device)
             L1 = A / 2
             L2 = L1.matmul(L1)
             A = torch.cat((L0.unsqueeze(0),L1.unsqueeze(0),L2.unsqueeze(0)))
@@ -113,7 +116,7 @@ class GNN(torch.nn.Module):
             masks = [1]*(len(self.blocks)-1)
         H0 = self.ini(A, H0)
 
-        H = self.blocks[0].forward(H0,torch.eye(H0.shape[0], device=self.device).unsqueeze(0))
+        H = self.blocks[0].forward(H0,torch.eye(H0.shape[0], device=A.device).unsqueeze(0))
 
         A = self.adj(A)
 
@@ -126,7 +129,7 @@ class GNN(torch.nn.Module):
     def lrp(self, A, gammas, t, inds, H0=None):
         
         H0 = self.ini(A, H0)
-        H1 = self.blocks[0].forward(H0,torch.eye(H0.shape[0], device=self.device).unsqueeze(0)).data
+        H1 = self.blocks[0].forward(H0,torch.eye(H0.shape[0], device=A.device).unsqueeze(0)).data
 
         A = self.adj(A)
 
