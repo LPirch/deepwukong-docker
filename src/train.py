@@ -67,4 +67,4 @@ def save_results(config, results):
     os.makedirs(config.result_folder, exist_ok=True)
     outfile = join(config.result_folder, f"{config.name}.json")
     with open(outfile, 'w') as f:
-        json.dump(results, f)
+        json.dump(results, f, indent=4)
