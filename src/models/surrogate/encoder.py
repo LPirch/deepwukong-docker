@@ -19,11 +19,12 @@ class SurrogateEncoder(torch.nn.Module):
 
     def __init__(self, config: DictConfig, vocab: Vocabulary,
                  vocabulary_size: int,
-                 pad_idx: int):
+                 pad_idx: int, device: str = 'cpu'):
         super(SurrogateEncoder, self).__init__()
+        self.device = device
         self.__config = config
         self.__pad_idx = pad_idx
-        self.__st_embedding = CustomSTEncoder(config, vocab, vocabulary_size, pad_idx)
+        self.__st_embedding = CustomSTEncoder(config, vocab, vocabulary_size, pad_idx, device)
 
         self.gcn_layers = []
         if config.n_hidden_layers > 0:
@@ -31,6 +32,7 @@ class SurrogateEncoder(torch.nn.Module):
                 input_size = config.rnn.hidden_size if i == 0 else config.hidden_size
                 setattr(self, f"gcn_layer{i}",
                         GNN(input_size, config.hidden_size))
+        self.gcn_layers = torch.nn.ModuleList(self.gcn_layers)
 
     def forward(self, batched_graph: Batch):
         batch = batched_graph.batch
@@ -58,8 +60,9 @@ class CustomSTEncoder(torch.nn.Module):
 
     def __init__(self, config: DictConfig, vocab: Vocabulary,
                  vocabulary_size: int,
-                 pad_idx: int):
+                 pad_idx: int, device: str = 'cpu'):
         super(CustomSTEncoder, self).__init__()
+        self.device = device
         self.__pad_idx = pad_idx
         if exists(config.w2v_path):
             self.__add_w2v_weights(config.w2v_path, vocab)
@@ -77,9 +80,9 @@ class CustomSTEncoder(torch.nn.Module):
         model = KeyedVectors.load(w2v_path, mmap="r")
         #model = gensim.models.KeyedVectors.load_word2vec_format(w2v_path)
 
-        weights = torch.FloatTensor(model.vectors)
+        weights = torch.FloatTensor(model.vectors, device=self.device)
         # TODO: compensate for <UNK> token -> zero embedding
-        unk_weights = torch.zeros((1, weights.size(1)))
+        unk_weights = torch.zeros((1, weights.size(1)), device=self.device)
         weights = torch.cat((unk_weights, weights))
         self.__wd_embedding = nn.Embedding.from_pretrained(weights, padding_idx=self.__pad_idx, freeze=False)
 
