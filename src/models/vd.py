@@ -41,25 +41,23 @@ class DeepWuKong(LightningModule):
         super().__init__()
         self.save_hyperparameters()
         self.__config = config
+        self.n_hidden_layers = config.classifier.n_hidden_layers
         hidden_size = config.classifier.hidden_size
         self.__graph_encoder = self._encoders[config.gnn.name](config.gnn, vocab, vocabulary_size,
                                                                pad_idx)
         # hidden layers
-        layers = [
-            nn.Linear(config.gnn.hidden_size, hidden_size),
-            nn.ReLU(),
-            nn.Dropout(config.classifier.drop_out)
-        ]
-        if config.classifier.n_hidden_layers < 1:
-            raise ValueError(
-                f"Invalid layers number ({config.classifier.n_hidden_layers})")
-        for _ in range(config.classifier.n_hidden_layers - 1):
-            layers += [
-                nn.Linear(hidden_size, hidden_size),
-                nn.ReLU(),
-                nn.Dropout(config.classifier.drop_out)
-            ]
-        self.__hidden_layers = nn.Sequential(*layers)
+        if self.n_hidden_layers > 0:
+            layers = []
+            for i in range(self.n_hidden_layers):
+                input_size = config.gnn.hidden_size if i == 0 else hidden_size
+                layers += [
+                    nn.Linear(input_size, hidden_size),
+                    nn.ReLU(),
+                    nn.Dropout(config.classifier.drop_out)
+                ]
+            self.__hidden_layers = nn.Sequential(*layers)
+        else:
+            self.__hidden_layers = None
         self.__classifier = nn.Linear(hidden_size, config.classifier.n_classes)
 
     def forward(self, batch: Batch) -> torch.Tensor:
@@ -72,7 +70,11 @@ class DeepWuKong(LightningModule):
         """
         # [n_XFG, hidden size]
         graph_hid = self.__graph_encoder(batch)
-        hiddens = self.__hidden_layers(graph_hid)
+        if self.n_hidden_layers > 0:
+            hiddens = self.__hidden_layers(graph_hid)
+        else:
+            # in this case, the output dim of the GraphEncoder must match the hidden_dim
+            hiddens = graph_hid
         # [n_XFG; n_classes]
         return self.__classifier(hiddens)
 
