@@ -16,7 +16,7 @@ log_every_epoch: 10
 progress_bar_refresh_rate: 1
 
 # results
-result_folder: "${data_folder}/results"
+result_folder: "results"
 
 dataset:
   name: CWE119
