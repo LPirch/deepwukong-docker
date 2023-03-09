@@ -4,8 +4,6 @@ import scipy,scipy.linalg
 
 from torch_geometric.utils import to_dense_adj
 
-train = False
-
 def softmin(b): return -0.5*torch.log(1.0+torch.exp(-2*b))
 
 class Block(torch.nn.Module):
@@ -76,12 +74,12 @@ class Block(torch.nn.Module):
 
 class GNN(torch.nn.Module):
 
-    def __init__(self,*sizes,mode='std'):
+    def __init__(self,sizes,mode='std'):
         super().__init__()
         if mode == 'std': k=1
         if mode == 'cheb': k=3
 
-        self.blocks = torch.nn.ModuleList([Block([s, s, s],k) for s in sizes])
+        self.blocks = torch.nn.ModuleList([Block(s,k) for s in sizes])
         self.mode = mode
 
     def __call__(self, x, edge_index, masks=None):

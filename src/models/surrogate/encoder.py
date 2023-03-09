@@ -30,7 +30,7 @@ class SurrogateEncoder(torch.nn.Module):
             for i in range(config.n_hidden_layers):
                 input_size = config.rnn.hidden_size if i == 0 else config.hidden_size
                 setattr(self, f"gcn_layer{i}",
-                        GNN(input_size, config.hidden_size))
+                        GNN([[input_size, config.hidden_size]]))
         self.gcn_layers = torch.nn.ModuleList(self.gcn_layers)
 
     def forward(self, batched_graph: Batch):
