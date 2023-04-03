@@ -25,8 +25,8 @@ class XFGDataModule(LightningDataModule):
     def collate_wrapper(batch: List[XFGSample]) -> XFGBatch:
         return XFGBatch(batch)
 
-    def __create_dataset(self, data_path: str) -> Dataset:
-        return XFGDataset(data_path, self.__config, self.__vocab)
+    def __create_dataset(self, data_path: str, retain_source: bool = False) -> Dataset:
+        return XFGDataset(data_path, self.__config, self.__vocab, retain_source)
 
     def train_dataloader(self) -> DataLoader:
         train_dataset_path = join(self.__data_folder, "train.json")

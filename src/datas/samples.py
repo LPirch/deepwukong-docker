@@ -8,6 +8,7 @@ import torch
 class XFGSample:
     graph: Data
     label: int
+    idx: int
 
 
 class XFGBatch:
@@ -16,8 +17,10 @@ class XFGBatch:
         self.labels = torch.tensor([XFG.label for XFG in XFGs],
                                    dtype=torch.long)
         self.graphs = []
+        self.idx = []
         for XFG in XFGs:
             self.graphs.append(XFG.graph)
+            self.idx.append(XFG.idx)
         self.graphs = Batch.from_data_list(self.graphs)
         self.sz = len(XFGs)
 

@@ -1,7 +1,8 @@
 from os.path import exists
 
 import torch
-from torch import nn
+import torch.nn as nn
+from torch_geometric.nn import GCNConv
 from omegaconf import DictConfig
 from torch_geometric.data import Batch
 from torch_geometric.nn import global_max_pool
@@ -12,7 +13,7 @@ from src.vocabulary import Vocabulary
 from src.models.surrogate.gcn import GNN
 
 
-class SurrogateEncoder(torch.nn.Module):
+class SurrogateEncoder(nn.Module):
     """
     Simple GCN encoder for later explanation with LRP.
     """
@@ -50,7 +51,7 @@ class SurrogateEncoder(torch.nn.Module):
         return out
 
 
-class CustomSTEncoder(torch.nn.Module):
+class CustomSTEncoder(nn.Module):
     """
 
     encoder for statement without recurrence
@@ -66,7 +67,7 @@ class CustomSTEncoder(torch.nn.Module):
                                            config.embed_size,
                                            padding_idx=pad_idx)
         # Additional embedding value for masked token
-        torch.nn.init.xavier_uniform_(self.__wd_embedding.weight.data)
+        nn.init.xavier_uniform_(self.__wd_embedding.weight.data)
         if exists(config.w2v_path):
             self.__add_w2v_weights(config.w2v_path, vocab)
 

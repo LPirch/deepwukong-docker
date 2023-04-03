@@ -20,7 +20,10 @@ class XFGEdge:
 
 @dataclass
 class XFG:
-    def __init__(self, path: str = None, xfg: nx.DiGraph = None):
+    def __init__(self, path: str = None, xfg: nx.DiGraph = None, retain_source = False):
+        self.__retain_source = retain_source
+        if self.__retain_source:
+            self.__source = []
         if xfg is not None:
             xfg_nx: nx.DiGraph = xfg
         elif path is not None:
@@ -38,6 +41,8 @@ class XFG:
             tokens = xfg_nx.nodes[n]["code_sym_token"]
             xfg_node = XFGNode(ln=n)
             self.__tokens_list.append(tokens)
+            if self.__retain_source:
+                self.__source.append(xfg_nx.nodes[n]["source"])
             self.__nodes.append(xfg_node)
             k_to_nodes[n] = xfg_node
             self.__node_to_idx[xfg_node] = idx

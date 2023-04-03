@@ -120,6 +120,7 @@ def process_parallel(testcaseid: str, queue: Queue, XFG_root_path: str, split_to
             to_remove = list()
             for idx, n in enumerate(xfg):
                 xfg.nodes[n]["code_sym_token"] = tokenize_code_line(sym_code_lines[idx], split_token)
+                xfg.nodes[n]["source"] = code_lines[idx]
                 if len(xfg.nodes[n]["code_sym_token"]) == 0:
                     to_remove.append(n)
             xfg.remove_nodes_from(to_remove)

@@ -8,7 +8,7 @@ from src.vocabulary import Vocabulary
 
 
 class XFGDataset(Dataset):
-    def __init__(self, XFG_paths_json: str, config: DictConfig, vocab: Vocabulary) -> None:
+    def __init__(self, XFG_paths_json: str, config: DictConfig, vocab: Vocabulary, retain_source: bool) -> None:
         """
         Args:
             XFG_root_path: json file of list of XFG paths
@@ -21,7 +21,7 @@ class XFGDataset(Dataset):
         self.__vocab = vocab
         self.__XFGs = list()
         for xfg_path in __XFG_paths_all:
-            xfg = XFG(path=xfg_path)
+            xfg = XFG(path=xfg_path, retain_source=retain_source)
             # if len(xfg.nodes) != 0:
             self.__XFGs.append(xfg)
         self.__n_samples = len(self.__XFGs)
@@ -33,7 +33,8 @@ class XFGDataset(Dataset):
         xfg: XFG = self.__XFGs[index]
         return XFGSample(graph=xfg.to_torch(self.__vocab,
                                             self.__config.dataset.token.max_parts),
-                         label=xfg.label)
+                         label=xfg.label,
+                         idx = index)
 
     def get_n_samples(self):
         return self.__n_samples
