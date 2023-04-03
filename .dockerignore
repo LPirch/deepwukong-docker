@@ -3,3 +3,8 @@ data
 tags
 .vscode
 .venv
+
+__pycache__
+**/*.pyc
+ts_logger
+dwk.tar.gz
