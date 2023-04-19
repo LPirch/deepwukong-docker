@@ -22,8 +22,9 @@ This is an overview about the applied adjustments:
 docker build . -t dwk
 
 # change device IDs as needed and create a local result path
+# if you train on CPU, just leave out the GPU option in docker run
 mkdir results
-docker run --gpus '"device=0,3"' -v $(realpath results):/home/dwk/results dwk ./scripts/reproduce_all.sh
+docker run --gpus '"device=0,3"' -v $(realpath results):/home/dwk/results dwk ./scripts/eval_preprocessed.sh
 ```
 
 ## Included Experiments
