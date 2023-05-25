@@ -27,11 +27,13 @@ class SurrogateEncoder(nn.Module):
         self.__st_embedding = CustomSTEncoder(config, vocab, vocabulary_size, pad_idx)
 
         self.gcn_layers = []
-        if config.n_hidden_layers > 0:
-            for i in range(config.n_hidden_layers):
-                input_size = config.rnn.hidden_size if i == 0 else config.hidden_size
-                setattr(self, f"gcn_layer{i}",
-                        GNN([[input_size, config.hidden_size]]))
+        # if config.n_hidden_layers > 0:
+        #     for i in range(config.n_hidden_layers):
+        #         input_size = config.rnn.hidden_size if i == 0 else config.hidden_size
+        #         setattr(self, f"gcn_layer{i}",
+        #                 GNN([[input_size, config.hidden_size]]))
+                
+        setattr(self, f"gcn_layer{0}", GNN([[config.rnn.hidden_size, config.hidden_size]] + [[config.hidden_size,config.hidden_size]]*(config.n_hidden_layers-1)))
         self.gcn_layers = torch.nn.ModuleList(self.gcn_layers)
 
     def forward(self, batched_graph: Batch):
@@ -42,9 +44,10 @@ class SurrogateEncoder(nn.Module):
         out = self.__st_embedding(batched_graph.x)
 
         # GCN layers
-        if self.__config.n_hidden_layers > 0:
-            for i in range(self.__config.n_hidden_layers - 1):
-                out = F.relu(getattr(self, f"gcn_layer{i}")(out, edge_index))
+        # if self.__config.n_hidden_layers > 0:
+        #     for i in range(self.__config.n_hidden_layers - 1):
+        #         out = F.relu(getattr(self, f"gcn_layer{i}")(out, edge_index))
+        out = F.relu(getattr(self, f"gcn_layer0")(out, edge_index))
 
         # graph-level pooling
         out = global_max_pool(out, batch)

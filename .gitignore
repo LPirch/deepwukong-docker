@@ -4,7 +4,9 @@
 __pycache__/
 notebooks/
 ts_logger/
-
+data/
+results/html*
+joern
 *.pyc
 .*/
 *.html
