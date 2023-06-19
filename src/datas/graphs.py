@@ -31,6 +31,8 @@ class XFG:
             xfg_nx: nx.DiGraph = nx.read_gpickle(path)
         else:
             raise ValueError("invalid inputs!")
+        self.__source_file = xfg_nx.graph["file_paths"][0]
+        self.__key_line = xfg_nx.graph["key_line"]
         self.__init_graph(xfg_nx)
 
     def __init_graph(self, xfg_nx: nx.DiGraph):
