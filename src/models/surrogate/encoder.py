@@ -5,7 +5,7 @@ import torch.nn as nn
 from torch_geometric.nn import GCNConv
 from omegaconf import DictConfig
 from torch_geometric.data import Batch
-from torch_geometric.nn import global_max_pool
+from torch_geometric.nn import global_max_pool, global_sum_pool
 import torch.nn.functional as F
 from gensim.models import KeyedVectors
 
@@ -50,7 +50,8 @@ class SurrogateEncoder(nn.Module):
         out = F.relu(getattr(self, f"gcn_layer0")(out, edge_index))
 
         # graph-level pooling
-        out = global_max_pool(out, batch)
+        # out = global_max_pool(out, batch)
+        out = global_sum_pool(out, batch)
         return out
 
 
